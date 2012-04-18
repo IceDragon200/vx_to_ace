@@ -1,0 +1,1 @@
+$LOAD_PATH << Dir.getwd + "/src/"module Mixin;endrequire 'console'require 'mkfeature'require 'mkeffect'require 'vxdump2ace'begin  Graphics.resize_screen(128, 128)  VXDump2Ace.run!()end 
