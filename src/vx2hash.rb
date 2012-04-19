@@ -113,21 +113,25 @@ module VX2Hash
     data.each_with_index do |f,i|
       pa = Array.new(data.size,"-")
       pa[i] = "O"
-      puts fmsg("Progress: #{pa.join("|")} #{(i/pa.size.to_f*100.0).round()}%")
+      #puts fmsg("Progress: #{pa.join("|")} #{(i/pa.size.to_f*100.0).round()}%")
       puts fmsg("-Loading #{f}-")
-      obj = load_data(f)
-      result = case(obj)
-      when(Array)
-        vx2dump_a(obj)
-      when(Hash)  
-        vx2dump_h(obj)
-      else
-        try_vx2dump(obj)
-      end 
-      puts fmsg("Dumped #{obj.class}")
-      fn = "VX2Data(Out)/#{File.basename(f).gsub(/\.rvdata/i,".vx2dump")}"
-      save_data(result,fn)
-      puts fmsg("#{obj.class.name} dumped to #{fn}")
+      begin
+        obj = load_data(f)
+        result = case(obj)
+        when(Array)
+          vx2dump_a(obj)
+        when(Hash)  
+          vx2dump_h(obj)
+        else
+          try_vx2dump(obj)
+        end 
+        puts fmsg("Dumped #{obj.class}")
+        fn = "VX2Data(Out)/#{File.basename(f).gsub(/\.rvdata/i,".vx2dump")}"
+        save_data(result,fn)
+        puts fmsg("#{obj.class.name} dumped to #{fn}")
+      rescue(Exception) => ex
+        puts fmsg("Failed to load #{f}")
+      end
       #swait(60)
     end  
     paw "Dumping complete"

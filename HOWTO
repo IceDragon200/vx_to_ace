@@ -3,7 +3,7 @@
 // Created By    : IceDragon
 // Date Created  : 03/29/2012
 // Date Modified : 04/16/2012
-// Version       : 0.6
+// Version       : 0.9
 #==============================================================================#
 // Warranty
 //   This software is provided, as is.
@@ -32,9 +32,8 @@
 //     By default V2A does not copy Actor Parameters to the corresponding classes
 //     **You should only use this, if each actor has there own unique class.
 //      
-//   CleverClassEquip=0 (Currently disabled, and uncoded)
-//     This would try to create weapon_types based on a sorting and grouping algorithim.
-//     Currently this is not implemented, and therefore not available.
+//   CleverClassEquip=0 
+//     This will try to create unique weapon and armor types for classes
 //
 // General
 1. Copy your rvdata (RMVX) into the VXData(In) folder, if the folder does not exist, create it.

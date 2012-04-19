@@ -3,19 +3,147 @@
 #==============================================================================#
 # // Created By    : IceDragon(rpgmakervx.net,rpgmakervxace.net,rpgmakerweb.com)
 # // Date Created  : 03/29/2012
-# // Date Modified : 04/16/2012
-# // Version       : 0.1
+# // Date Modified : 04/18/2012
+# // Version       : 0.9
 #==============================================================================#
 # (03/29/2012)
 #   Started and Finished
 # (04/16/2012)
 #   Major bugfix regarding moveroutes, commands where missing and broken.
 #   Fixed missing BGM,BGS,ME,SE also related to the moveroute issue.
+# (04/18/2012)
+#   Several Bugfixes
+#     Variables which used items, actors, enemies, map_id where missing
+#     Class weapon/armor is now uniquely set if CleverClassEquip is set to 1
+#==============================================================================#
+# // TODO
+# // Shorten code and cleanup, add more error handling and clean console output
 #==============================================================================#
 class Hash
   def get_values(*args)
     args.collect {|a|self[a]}
   end
+end
+class RPG::EventCommand
+  module EvCCodes
+    # // VX
+    SHOW_TEXT              = 101
+    SHOW_TEXT_LINE         = 401
+    SHOW_CHOICE            = 102
+    SHOW_CHOICE_BRANCH     = 402
+    SHOW_CHOICE_CANCEL     = 403
+    SHOW_CHOICE_END        = 404
+    INPUT_NUMBER           = 103
+    COMMENT_START          = 108
+    COMMENT_LINE           = 408
+    CONDITIONAL_BRANCH     = 111
+    ELSE                   = 411
+    LOOP                   = 112
+    REPEAT_ABOVE           = 413
+    BREAK_LOOP             = 113
+    EXIT_EVENT_PROCCESS    = 115
+    CALL_COMMON_EVENT      = 117
+    LABEL                  = 118
+    JUMP_TO_LABEL          = 119
+    CONTROL_SWITCH         = 121 
+    CONTROL_VARIABLE       = 122
+    CONTROL_SELF_SWITCH    = 123
+    CONTROL_TIMER          = 124
+    CHANGE_GOLD            = 125
+    CHANGE_ITEMS           = 126
+    CHANGE_WEAPON          = 127
+    CHANGE_ARMOR           = 128
+    CHANGE_PARTY_MEMBER    = 129
+    CHANGE_BATTLE_BGM      = 132
+    CHANGE_BATTLE_ME       = 133
+    CHANGE_SAVE_ACCESS     = 134
+    CHANGE_MENU_ACCESS     = 135
+    CHANGE_ENCOUNTER       = 136
+    TRANSFER_PLAYER        = 201
+    SET_VEHICLE_LOCATION   = 202
+    SET_EVENT_LOCATION     = 203
+    SCROLL_MAP             = 204
+    SET_MOVE_ROUTE         = 205
+    MOVE_COMMAND           = 505
+    GET_ON_OFF_VEHICLE     = 206
+    CHANGE_TRANSPERENCY    = 211
+    SHOW_ANIMATION         = 212
+    SHOW_BALLOON           = 213
+    ERASE_EVENT            = 214
+    FADEOUT_SCREEN         = 221
+    FADEIN_SCREEN          = 222
+    TINT_SCREEN            = 223
+    FLASH_SCREEN           = 224
+    SHAKE_SCREEN           = 225
+    WAIT                   = 230
+    SHOW_PICTURE           = 231
+    MOVE_PICTURE           = 232
+    ROTATE_PICTURE         = 233
+    TINT_PICTURE           = 234
+    ERASE_PICTURE          = 235
+    SET_WEATHER_EFFECTS    = 236
+    PLAY_BGM               = 241
+    FADEOUT_BGM            = 242
+    PLAY_BGS               = 245
+    FADEOUT_BGS            = 246
+    PLAY_ME                = 249 
+    PLAY_SE                = 250
+    STOP_SE                = 251
+    BATTLE_PROCESS         = 301
+    IF_WIN                 = 601
+    IF_ESCAPE              = 602
+    IF_LOSE                = 603
+    SHOP_PROCESS           = 302
+    NAME_INPUT_PROCESS     = 303
+    CHANGE_HP              = 311
+    CHANGE_MP              = 312
+    CHANGE_STATE           = 313
+    RECOVER_ALL            = 314
+    CHANGE_EXP             = 315
+    CHANGE_LEVEL           = 316
+    CHANGE_PARAMS          = 317
+    CHANGE_SKILLS          = 318
+    CHANGE_EQUIP           = 319
+    CHANGE_NAME            = 320
+    CHANGE_CLASS           = 321
+    CHANGE_ACTOR_GRAPHIC   = 322
+    CHANGE_VEHICLE_GRAPHIC = 323
+    CHANGE_ENEMY_HP        = 331
+    CHANGE_ENEMY_MP        = 332
+    CHANGE_ENEMY_STATE     = 333
+    ENEMY_RECOVER_ALL      = 334
+    ENEMY_APPEAR           = 335
+    ENEMY_TRANSFORM        = 336
+    SHOW_BATTLE_ANIMATION  = 337
+    FORCE_ACTION           = 339
+    ABORT_BATTLE           = 340
+    OPEN_MENU_SCREEN       = 351
+    OPEN_SAVE_SCREEN       = 352
+    GAMEOVER               = 353
+    RETURN_TO_TITLE_SCREEN = 354 
+    SCRIPT                 = 355
+    # // VX-Ace
+    SHOW_ITEM_SELECTION    = 104
+    SHOW_SCROLLING_TEXT    = 105
+    CHANGE_FORMATION_ACCESS= 137
+    CHANGE_WINDOW_TONE     = 138
+    FOLLOWERS_VISIBLE      = 216
+    FOLLOWERS_GATHER       = 217
+    SAVE_BGM               = 243
+    REPLAY_BGM             = 244
+    PLAY_MOVIE             = 261
+    CHANGE_MAP_NAME_DISPLAY= 281
+    CHANGE_TILESET         = 282
+    CHANGE_BATTLEBACK      = 283
+    CHANGE_PARALLAX        = 284
+    GET_POSITION_INFO      = 285
+    CHANGE_NICKNAME        = 324
+    # // Code Sets
+    COMMENT_CODES   = [COMMENT_START, COMMENT_LINE]
+    TEXT_CODES      = [SHOW_TEXT, SHOW_TEXT_LINE]
+    CONDITION_CODES = [CONDITIONAL_BRANCH, ELSE]
+  end
+  include EvCCodes
 end  
 module VXDump2Ace
   NAME2HSHCOM = {
@@ -33,6 +161,7 @@ module VXDump2Ace
     "RPG::Skill"       => "hsh2skill",
     "RPG::Armor"       => "hsh2armor",
     "RPG::Weapon"      => "hsh2weapon",
+    "RPG::EventCommand"=> "hsh2evCom",
     "RPG::MoveCommand" => "hsh2mvcom",
     "RPG::MoveRoute"   => "hsh2mvr"
   }
@@ -165,16 +294,34 @@ module VXDump2Ace
     evcom.code       = hsh[:code]                    # // Integer        
     evcom.indent     = hsh[:indent]                  # // Integer
     evcom.parameters = hsh[:parameters].collect{|o|try_vxdump2ace(o)}# // Array[]
-    #evcom = fixevcom(evcom)
-    evcom
+    fixevcom(evcom)
   end  
-  #def self.fixevcom(evcom)
-  #  result = evcom.clone
-  #  if(result.code ==)
-  #    result.parameters
-  #  end
-  #  result
-  #end
+  def self.fixevcom(evcom)
+    consts = RPG::EventCommand::EvCCodes
+    case(evcom.code)
+    when consts::CONTROL_VARIABLE
+      case(evcom.parameters[3])
+      when 3 # // Item
+        evcom.parameters[3] = 3
+        evcom.parameters.insert(4,0)
+      when 4 # // Actor
+        evcom.parameters[3] = 3
+        evcom.parameters[5] = ([0,1,2,3,4,5,6,7,8,10])[evcom.parameters[5]]
+        evcom.parameters.insert(4,3)
+      when 5 # // Enemy
+        evcom.parameters[3] = 3
+        evcom.parameters[5] = ([0,1,2,3,4,5,6,8])[evcom.parameters[5]]
+        evcom.parameters.insert(4,4)
+      when 6 # // Character
+        evcom.parameters[3] = 3
+        evcom.parameters.insert(4,5) 
+      when 7 # // Other
+        evcom.parameters[3] = 3
+        evcom.parameters.insert(4,7) 
+      end
+    end
+    evcom
+  end
   def self.hsh2mvr(hsh)
     mvr = RPG::MoveRoute.new
     mvr.repeat    = hsh[:repeat]       # // Boolean
@@ -189,6 +336,15 @@ module VXDump2Ace
     mvcm.parameters = hsh[:parameters].collect{|o|try_vxdump2ace(o)}# // Array[]
     mvcm 
   end  
+  def self.hsh2comev(hsh)
+    comev = RPG::CommonEvent.new()
+    comev.id        = hsh[:id]           # // Integer
+    comev.name      = hsh[:name]         # // String
+    comev.trigger   = hsh[:trigger]      # // Boolean
+    comev.switch_id = hsh[:switch_id]    # // Integer
+    comev.list      = hsh[:list].collect{|o|hsh2evCom(o)}# // Array[]
+    comev
+  end
   def self.hsh2map(hsh)
     map = RPG::Map.new(1,1)
     # // Ace only
@@ -268,6 +424,7 @@ module VXDump2Ace
     # // VX / Ace
     cls.id          = hsh[:id]   # // Integer
     cls.name        = hsh[:name] # // String
+    cls.features << MkFeature.stype_add(1)
     cls.features << MkFeature.tgr([1.00,0.75,0.50][hsh[:position]]) 
     # // Ace Tailing
     cls.features << MkFeature.hit_r(0.95)
@@ -298,6 +455,7 @@ module VXDump2Ace
     skl.repeats      = 1
     skl.tp_gain      = 0
     skl.effects      = []
+    skl.stype_id     = 1
     # // VX / Ace
     skl.id           = hsh[:id]          # // Integer
     skl.name         = hsh[:name]        # // String
@@ -634,54 +792,64 @@ module VXDump2Ace
   def self.hsh2terms(hsh)
     terms = RPG::System::Terms.new()
     terms.basic    = Array.new(8) {''}
-    terms.basic[0] = hsh[:level]
-    terms.basic[1] = hsh[:level_a]
-    terms.basic[2] = hsh[:hp]
-    terms.basic[3] = hsh[:hp_a]
-    terms.basic[4] = hsh[:mp]
-    terms.basic[5] = hsh[:mp_a]
+    terms.basic[0] = hsh[:level]       # // String
+    terms.basic[1] = hsh[:level_a]     # // String
+    terms.basic[2] = hsh[:hp]          # // String
+    terms.basic[3] = hsh[:hp_a]        # // String
+    terms.basic[4] = hsh[:mp]          # // String
+    terms.basic[5] = hsh[:mp_a]        # // String
     terms.basic[6] = 'TP'
     terms.basic[7] = 'TP'
     terms.params   = Array.new(8) {''}
     terms.params[0]= 'MHP'
     terms.params[1]= 'MMP'
-    terms.params[2]= hsh[:atk]
-    terms.params[3]= hsh[:def]
-    terms.params[4]= hsh[:spi]
+    terms.params[2]= hsh[:atk]         # // String
+    terms.params[3]= hsh[:def]         # // String
+    terms.params[4]= hsh[:spi]         # // String
     terms.params[5]= 'RES'
-    terms.params[6]= hsh[:agi]
+    terms.params[6]= hsh[:agi]         # // String
     terms.params[7]= 'LUK'
     terms.etypes   = Array.new(5) {''}
-    terms.etypes[0]= hsh[:weapon]
-    terms.etypes[1]= hsh[:armor1]
-    terms.etypes[2]= hsh[:armor2]
-    terms.etypes[3]= hsh[:armor3]
-    terms.etypes[4]= hsh[:armor4]
+    terms.etypes[0]= hsh[:weapon]      # // String
+    terms.etypes[1]= hsh[:armor1]      # // String
+    terms.etypes[2]= hsh[:armor2]      # // String
+    terms.etypes[3]= hsh[:armor3]      # // String
+    terms.etypes[4]= hsh[:armor4]      # // String
     terms.commands = Array.new(23) {''}
-    terms.commands[0] = hsh[:fight]
-    terms.commands[1] = hsh[:escape]
-    terms.commands[2] = hsh[:attack]
-    terms.commands[3] = hsh[:guard]
-    terms.commands[4] = hsh[:item]
-    terms.commands[5] = hsh[:skill]
-    terms.commands[6] = hsh[:equip]
-    terms.commands[7] = hsh[:status]
+    terms.commands[0] = hsh[:fight]    # // String
+    terms.commands[1] = hsh[:escape]   # // String
+    terms.commands[2] = hsh[:attack]   # // String
+    terms.commands[3] = hsh[:guard]    # // String
+    terms.commands[4] = hsh[:item]     # // String
+    terms.commands[5] = hsh[:skill]    # // String
+    terms.commands[6] = hsh[:equip]    # // String
+    terms.commands[7] = hsh[:status]   # // String
     terms.commands[8] = 'Formation'
-    terms.commands[9] = hsh[:save]
-    terms.commands[10]= hsh[:game_end]
+    terms.commands[9] = hsh[:save]     # // String
+    terms.commands[10]= hsh[:game_end] # // String
     terms.commands[12]= 'Weapon'
-    terms.commands[13]= 'Armor'
-    terms.commands[14]= 'Important' # // Important Items
-    terms.commands[15]= 'Change'    # // Change Equip
-    terms.commands[16]= 'Optimize'  # // Best Equipment
-    terms.commands[17]= 'Clear'     # // Remove Equipment
-    terms.commands[18]= hsh[:new_game]
-    terms.commands[19]= hsh[:continue]
-    terms.commands[20]= hsh[:shutdown]
-    terms.commands[21]= hsh[:to_title]
-    terms.commands[22]= hsh[:cancel]        
+    terms.commands[13]= 'Armor'        
+    terms.commands[14]= 'Important'    # // Important Items
+    terms.commands[15]= 'Change'       # // Change Equip
+    terms.commands[16]= 'Optimize'     # // Best Equipment
+    terms.commands[17]= 'Clear'        # // Remove Equipment
+    terms.commands[18]= hsh[:new_game] # // String
+    terms.commands[19]= hsh[:continue] # // String
+    terms.commands[20]= hsh[:shutdown] # // String
+    terms.commands[21]= hsh[:to_title] # // String
+    terms.commands[22]= hsh[:cancel]   # // String
     terms
   end  
+  def self.hsh2mapinfo(hsh)
+    mapinf = RPG::MapInfo.new()
+    mapinf.name      = hsh[:name]      # // String
+    mapinf.parent_id = hsh[:parent_id] # // Integer
+    mapinf.order     = hsh[:order]     # // Integer
+    mapinf.expanded  = hsh[:expanded]  # // Boolean
+    mapinf.scroll_x  = hsh[:scroll_x]  # // Integer
+    mapinf.scroll_y  = hsh[:scroll_y]  # // Integer
+    mapinf
+  end
   def self.load_vx2dump(filename)
     begin
       return load_data("VX2Data(Out)/#{filename}.vx2dump")
@@ -734,7 +902,7 @@ module VXDump2Ace
     GPS.call( 'Settings',s, '', str, 255, ".\\VX2Ace.ini" )
     str.delete!("\0")
   end  
-  def self.run!()
+  def self.run!() 
     unless(File.exist?("VX2Data(Out)"))
       puts fmsg("Making VX2Data(Out) Folder")
       Dir.mkdir("VX2Data(Out)")
@@ -750,9 +918,12 @@ module VXDump2Ace
     swait(80)
     loaded = {}
     ["Actors","Classes","Skills","Items",
-     "Weapons","Armors","Enemies","States"].each do |s|
+     "Weapons","Armors","Enemies","States",
+     "CommonEvents", "System", "MapInfos"
+    ].each do |s|
       loaded[s] = load_vx2dump(s) 
     end
+    actors=classes=skills=items=weapons=armors=enemies=states=system=common_events=mapinfos=nil
     if(loaded["Actors"])
       pfmsg "Loading and converting Actors"
       actors = loaded["Actors"].collect{|hsh|hsh ? hsh2actor(hsh) : hsh}
@@ -785,17 +956,26 @@ module VXDump2Ace
       pfmsg "Loading and converting States"
       states = loaded["States"].collect{|hsh|hsh ? hsh2state(hsh) : hsh}
     end
+    if(loaded["CommonEvents"])
+      pfmsg "Loading and converting CommonEvents"
+      common_events = loaded["CommonEvents"].collect{|hsh|hsh ? hsh2comev(hsh) : hsh}
+    end
     if(loaded["System"])
       pfmsg "Loading and converting System"
-      system = hsh2system(load_vx2dump("System"))
+      system = hsh2system(loaded["System"])
     end  
-    maps = Dir.glob("VX2Data(Out)/Map*.vx2dump")
+    if(loaded["MapInfos"])
+      pfmsg "Loading and converting MapInfos"
+      mapinfos = Hash[loaded["MapInfos"].collect{|(mid,hsh)|[mid,hsh2mapinfo(hsh)]}]
+    end 
+    maps = Dir.glob("VX2Data(Out)/Map*.vx2dump").select{|f|f=~/Map[0-9]{3}/i}
     if(maps&&maps.size>0)
       pfmsg "Loading and converting Maps"
-      maps = maps.collect{|m|
+      maps = maps.collect do |m|
+        tmp = load_data(m)
         puts "->Converting Map #{m}"
-        [hsh2map(load_data(m)),m]
-      }
+        [hsh2map(tmp),m]
+      end
     end  
     pfmsg "[Load and Convert Complete]"
     # // 
@@ -831,17 +1011,61 @@ module VXDump2Ace
         cls.exp_params = [a[:exp_basis], a[:exp_inflation]] + cls.exp_params[2..3]
       end
     end 
-    #if(config_hsh[:cce]==1)
-    #  clsweapons, clsarmors = nil, nil
-    #  loaded["Classes"].each do |clshsh|
-    #    clsweapons = clshsh[:weapon_set]
-    #    clsarmors  = clshsh[:armor_set]
-    #  end  
-    #  # // hsh[:weapon_set] Level 2 Conversion required
-    #  # // hsh[:armor_set] Level 2 Conversion required
-    #end  
+    if(config_hsh[:cce]==1&&classes&&system&&(weapons||armors))
+      puts "Uniqing Equipment per class"
+      clsweapons = []
+      clsarmors  = []
+      wepset = []
+      armset = []
+      lclasses = loaded["Classes"]
+      assoc_wids = {}
+      assoc_aids = {}
+      lclasses.each do |clshsh| next unless(clshsh)
+        wepset << clshsh[:weapon_set]
+        armset << clshsh[:armor_set]
+        clsweapons+= clshsh[:weapon_set]
+        clsarmors += clshsh[:armor_set]
+        clshsh[:weapon_set].each {|i|(assoc_wids[i]||=[]).push(clshsh[:id])}
+        clshsh[:armor_set].each {|i|(assoc_aids[i]||=[]).push(clshsh[:id])}
+      end  
+      clsweapons.uniq_arrays!(wepset)
+      clsarmors.uniq_arrays!(armset)
+      # // Bit sloppy
+      if(weapons)
+        puts "Processing Weapons"
+        clsweapons.each_with_index do |wep_a,wtid|
+          wep_a.each do |wid|
+            system.weapon_types[wtid+1] = "WeaponSet#{"%02d"%(wtid+1)}"
+            weapons[wid].wtype_id = wtid+1
+          end
+        end
+        classes.compact.each do |cls|
+          lcls = lclasses[cls.id]
+          lcls[:weapon_set].collect{|wid|weapons[wid].wtype_id}.uniq.compact.sort.each { |wty|
+            puts "assigning WTYPE #{wty} to class #{cls.id} #{cls.name}"
+            cls.features << MkFeature.equip_wtype(wty) 
+          }  
+        end
+      end
+      if(armors)
+        puts "Processing Armors"
+        clsarmors.each_with_index do |arm_a,atid|
+          arm_a.each do |aid|
+            system.armor_types[atid+1] = "ArmorSet#{"%02d"%(atid+1)}"
+            armors[aid].atype_id = atid+1
+          end
+        end
+        classes.compact.each do |cls|
+          lcls = lclasses[cls.id]
+          lcls[:armor_set].collect{|aid|armors[aid].atype_id}.uniq.compact.sort.each { |aty|
+            puts "assigning ATYPE #{aty} to class #{cls.id} #{cls.name}"
+            cls.features << MkFeature.equip_atype(aty) 
+          }  
+        end
+      end
+    end  
     # // 
-    pfmsg "Saving"
+    pfmsg "-Saving- .rvdata2"
     if(actors)
       pfmsg "Actors >> "
       save_data_ace(actors , "Actors") 
@@ -874,16 +1098,24 @@ module VXDump2Ace
       pfmsg "States >> "
       save_data_ace(states , "States") 
     end
+    if(common_events)
+      pfmsg "CommonEvents >> "
+      save_data_ace(common_events, "CommonEvents") 
+    end  
     if(system)
       pfmsg "System >> "
       save_data_ace(system , "System")
+    end
+    if(mapinfos)
+      pfmsg "MapInfos >> "
+      save_data_ace(mapinfos, "MapInfos")
     end
     if(maps&&maps.size>0)
       pfmsg "Maps >> "
       maps.each {|a|save_data_ace(a[0],File.basename(a[1]).gsub(/\.vx2dump/i,""))}
     end  
     # // 
-    swait(40)
     paw("Hash2Ace Complete")
+    swait(40)
   end  
 end      
