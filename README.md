@@ -128,6 +128,6 @@ Just simply run nix-main.rb with no parameters to see the help, or just --help a
 2 . ruby nix-main.rb --tohash
 3 . Wait for it to finish, and check the <--dest>, ensure that you have *.vx2dump files.
 4 . ruby nix-main.rb --toace
-5 . Wait for it to finish, and check the <--src> folder to ensure that you have *.rvdata2 files.
+5 . Wait for it to finish, and check the <--dest> folder to ensure that you have *.rvdata2 files.
 5 . Your done
 ```
