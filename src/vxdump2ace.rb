@@ -861,7 +861,7 @@ module VXDump2Ace
     end  
   end
   def self.save_data_ace(obj, filename)
-    save_data(obj, "Data(Ace)/#{filename}.rvdata2")
+    save_data(obj, "output_data(Ace)/#{filename}.rvdata2")
   end  
   def self.fmsg(text)
     format("<Hash2Ace:@>%s",text)
@@ -909,7 +909,7 @@ module VXDump2Ace
     end 
     unless(File.exist?("Data(Ace)"))
       puts fmsg("Making Data(Ace) Folder")
-      Dir.mkdir("Data(Ace)")
+      Dir.mkdir("output_data(Ace)")
     end
     config_hsh = read_config()
     pfmsg "[ap2c]: #{config_hsh[:ap2c]}" 
