@@ -1,4 +1,7 @@
 ﻿=begin
+  
+  rgss2in3.rb
+
   by IceDragon
   dc 03/19/2012
   dm 03/19/2012
@@ -9,6 +12,11 @@
     Because everytime you save your game with rmvx it changes the dll 
     in the Game.ini to rgss2*.dll:
     You should just rename the rgss3*.dll to the equavilent rgss2*.dll
+
+  Font Settings
+    Using the Japanese (Trial RGSS3), you need to redefine the fonts
+    Also you need the VL Gothic font in your project's font folder 
+    at all times. Its troublesome really.
 
 =end
 
@@ -24,19 +32,7 @@ module RPG
   # // REMOVE the RGSS3 classes from this module
   c.each { |c| remove_const(c) }
 end 
-#==============================================================================#
-# ■ Font
-#==============================================================================#
-# // • Created By    : IceDragon
-# // • Modified By   : IceDragon
-# // • Data Created  : 12/08/2011
-# // • Data Modified : 12/08/2011
-# // • Version       : 1.0
-#==============================================================================#
-# ● Explanation
-#     Using the Japanese (Trial RGSS3), you need to redefine the fonts
-#     Also you need the VL Gothic font in your project folder at all times.
-#==============================================================================#
+
 Font.default_name      = ["Verdana", "Arial", "Courier New"] 
 Font.default_size      = 20
 Font.default_bold      = false
@@ -45,9 +41,7 @@ Font.default_shadow    = false
 Font.default_outline   = true
 Font.default_color     = Color.new( 255, 255, 255, 255 )
 Font.default_out_color = Color.new(  20,  20,  20, 128 )#96 )
-#=■==========================================================================■=#
-#                           // ● End of File ● //                              #
-#=■==========================================================================■=#
+
 module RPG
   class AudioFile
     def initialize(name = "", volume = 100, pitch = 100)
