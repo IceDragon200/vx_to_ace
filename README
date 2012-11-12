@@ -1,6 +1,5 @@
 # VX2ACE
-
-### Intro
+## Version 0.91
 
 ### Warranty
 This software is provided, as is.
@@ -11,6 +10,12 @@ Use at your own risk.
 Nothing big, this little package contains 2 scripts so to speak, 
 which convert VX (rvdata) to a VX2Ace (vx2dump) and then to Ace (rvdata2)
 
+### Features
+
+### Future Plans
+A working linux port. For whatever reason I'd want that.
+Purify source code, and make the process a little easier.
+
 ### Few problems:
 ```
 ### Armor
@@ -19,7 +24,6 @@ which convert VX (rvdata) to a VX2Ace (vx2dump) and then to Ace (rvdata2)
 ### State
   Offset by Opposite, is not supported.
 ```  
-
 ### How to Use:
 // VX2Ace.ini
 //   ActorParam2Class=1
