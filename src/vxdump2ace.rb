@@ -20,10 +20,13 @@
 # // Shorten code and cleanup, add more error handling and clean console output
 #==============================================================================#
 class Hash
+
   def get_values(*args)
     args.collect {|a|self[a]}
   end
+  
 end
+
 class RPG::EventCommand
   module EvCCodes
     # // VX

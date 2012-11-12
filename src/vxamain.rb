@@ -1,1 +1,7 @@
-$LOAD_PATH << Dir.getwd + "/src/"module Mixin;endrequire 'array-ex'require 'console'require 'mkfeature'require 'mkeffect'require 'vxdump2ace'begin  Graphics.resize_screen(128, 128)  VXDump2Ace.run!()end 
+#
+# vxamain.rb
+#
+# Alias to the main-vxa.rb
+require_relative 'main.rb'
+
+main_vxa()

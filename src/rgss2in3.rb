@@ -1,13 +1,23 @@
-﻿# // Created By IceDragon
-# // Date Created : 03/19/2012
-# // Date Modified : 03/19/2012
-# // Cheat trick
-# // Because everytime you save your game with rmvx it changes the dll to rgss2*.dll
-# // You should just rename the rgss3*.dll to the equavilent 2
+﻿=begin
+  by IceDragon
+  dc 03/19/2012
+  dm 03/19/2012
+
+  This allows you to use RGSS2's RPG Data within RGSS3.
+
+  Cheat trick
+    Because everytime you save your game with rmvx it changes the dll 
+    in the Game.ini to rgss2*.dll:
+    You should just rename the rgss3*.dll to the equavilent rgss2*.dll
+
+=end
+
+# if for any reason you still want the RGSS3 RPG classes you can have them
 module RPGRGSS3
   # // Remap all the RGSS3 classes to the current module
   RPG.constants.each { |c| const_set(c,RPG.const_get(c)) }
 end  
+
 module RPG
   # // Store all the constants
   c = constants.to_a

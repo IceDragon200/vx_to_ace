@@ -7,7 +7,9 @@
 # // Version       : 0.1
 #==============================================================================#
 class Table
+
   include Mixin::TableExpansion
+
   def to_table_array
     arra = Array.new(2)
     arra[0] = [self.xsize,self.ysize,self.zsize]# // Size Declaration
@@ -23,20 +25,28 @@ class Table
     end  
     return arra
   end
+
   def vx2dump()
     hsh = {}
     hsh[:_header] = [self.class.name]
     hsh[:_config], hsh[:data] = to_table_array
     return hsh
   end  
+
 end  
+
 class Rect
+
   def to_a();[self.x,self.y,self.width,self.height];end
+
   def vx2dump()
     (hsh = {})[:_header]=[self.class.name];hsh[:data]=to_a();return hsh
   end  
+
 end  
+
 module VX2Hash  
+
   def self.get_all_classes(obj)
     result = [];cls = nil
     obj.constants.each do |c|
@@ -44,6 +54,7 @@ module VX2Hash
     end  
     return result
   end  
+
   def self.try_vx2dump(obj)
     case(obj)
     when(Array)
@@ -54,15 +65,19 @@ module VX2Hash
       (obj.respond_to?(:vx2dump)) ? obj.vx2dump : obj
     end  
   end  
+
   def self.vx2dump_a(arra)
     result = Array.new(arra.size,nil)
     arra.each_with_index do|o,i|result[i]=try_vx2dump(o);end
     return result
   end
+
   def self.vx2dump_h(hsh)
     result = {};hsh.each_pair do|k,v|result[k]=try_vx2dump(v);end;return result
   end 
+
   module Include
+
     def vx2dump()
       (hsh = {})[:_header] = [self.class.name]
       instance_variables.each do |v|
@@ -70,17 +85,25 @@ module VX2Hash
       end
       return hsh
     end 
+
   end 
+
 end  
+
 module RPG
+
   VX2Hash.get_all_classes(self).each do |c|
     c.send("include",VX2Hash::Include)
   end
+
 end 
+
 module VX2Hash
+
   def self.fmsg(text)
     format("<VX2Hash:@>%s",text)
   end  
+
   # // Print and wait
   def self.paw(text)
     puts "["+("-"*20)+"]"
@@ -89,6 +112,7 @@ module VX2Hash
     #puts "Press Return to continue"
     #gets
   end
+
   def self.swait(d)
     puts "Waiting"
     d.times do 
@@ -97,6 +121,7 @@ module VX2Hash
     end
     puts ""
   end  
+
   def self.run!()
     unless(File.exist?("VX2Data(Out)"))
       puts fmsg("Making VX2Data(Out) Folder")
@@ -136,4 +161,5 @@ module VX2Hash
     end  
     paw "Dumping complete"
   end  
+  
 end  

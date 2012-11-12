@@ -11,6 +11,10 @@ Nothing big, this little package contains 2 scripts so to speak,
 which convert VX (rvdata) to a VX2Ace (vx2dump) and then to Ace (rvdata2)
 
 ### Features
+```
+  Conversion of RPG Maker VX project data to RPG Maker VXA Compliant
+
+```
 
 ### Future Plans
 A working linux port. For whatever reason I'd want that.
@@ -23,22 +27,47 @@ Purify source code, and make the process a little easier.
 
 ### State
   Offset by Opposite, is not supported.
+
+### Scripts
+  So far I have been able to extract scripts.rvdata and scripts.rvdata2
+  However repacking has posed a problem when working with the editor.
+
 ```  
+
 ### How to Use:
-VX2Ace.ini
+vx2ace.conf - VX2Ace Config File
 ```
-ActorParam2Class=1
+VXDataIn=<String>
+  Set a folder for the source *.rvdata
+  default:
+    "vx2-data-in"
+
+VXDataOut=<String>
+  Set a output folder for the VX Hash Data
+  default:
+    "vx2-data-out"
+
+AceDataOut=<String>
+  Set a output directory for the Completed Ace data
+  default:
+    "vx2-data-out-ace"
+
+ActorParam2Class=<Integer>
   A change in VXA was that Actor's no longer had Parameters
   This was instead moved to classes.
   By default V2A does not copy Actor Parameters to the corresponding classes
   **You should only use this, if each actor has there own unique class.
-    
-CleverClassEquip=0 
+  default:
+    1
+
+CleverClassEquip=<Integer>
   This will try to create unique weapon and armor types for classes
+  default:
+    0
 ```
+#### NOTE - this file is actually loaded as ruby code, so you can do some crazy stuff if you need to.
 
 ### General Instructions
-
 Windows Users
 ```
 1 .Copy your rvdata (RMVX) into the VXData(In) folder, if the folder does not exist, create it.

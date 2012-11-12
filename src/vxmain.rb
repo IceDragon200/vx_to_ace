@@ -1,1 +1,7 @@
-﻿$LOAD_PATH << Dir.getwd + "/src/" module Mixin;endrequire 'console'require 'rgss2in3'require 'mixin-tableexpansion'require 'vx2hash'begin  Graphics.resize_screen(128, 128)  VX2Hash.run!()end
+#
+# vxmain.rb
+#
+# Alias to the main-vx.rb
+require_relative 'main.rb'
+
+main_vx()

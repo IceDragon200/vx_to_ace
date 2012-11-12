@@ -1,3 +1,4 @@
+@echo off
 echo [Welcome to VX2Ace Automated Batch File]
 echo Cleaning old files
 call cleanup.bat
