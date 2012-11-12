@@ -1,7 +1,7 @@
 VX2ACE
 ======
 
-## Version 0.91 (Untested)
+## Version 0.91 (Untested : Windows)
 
 ### Warranty
 This software is provided, as is.
@@ -80,11 +80,6 @@ Instructions - READ EM
 <VXDataOut>
 <AceDataData>  
   these refer to the vx2ace-conf.rb constants
-```
-
-Everyone *
-```
-
 ```
 
 Windows Users
