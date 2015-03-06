@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+require 'optparse'
+require 'vx_to_ace/main'
+
+options = {
+  output: 'vxdump-data'
+}
+
+parser = OptionParser.new do |opts|
+  opts.on '-o', '--output NAME', String, 'output directory' do |v|
+    options[:output] = v
+  end
+  opts.on '-h', '--help', 'display help' do |v|
+    puts parser
+    exit 0
+  end
+end
+
+argv = parser.parse(ARGV.dup)
+main_vx src: argv.first || 'Data', dest: options[:output]
